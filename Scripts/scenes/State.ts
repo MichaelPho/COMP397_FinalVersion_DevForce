@@ -11,6 +11,8 @@ module scenes
         
         PLAY3,
         BOSS,
+        INTRO,
+        HOWTOPLAY,
         NUM_OF_SCENES
 
     }

@@ -44,6 +44,12 @@ var objects;
             this._move();
             this._checkBounds();
         };
+        background.prototype.SetMiddle = function () {
+            this.position = new objects.Vector2(120, 200);
+        };
+        background.prototype.SetMiddle2 = function () {
+            this.position = new objects.Vector2(60, 60);
+        };
         background.prototype.Reset = function () {
             this.position = new objects.Vector2(0, 0);
         };

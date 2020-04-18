@@ -11,7 +11,9 @@ var scenes;
         State[State["PLAY2"] = 4] = "PLAY2";
         State[State["PLAY3"] = 5] = "PLAY3";
         State[State["BOSS"] = 6] = "BOSS";
-        State[State["NUM_OF_SCENES"] = 7] = "NUM_OF_SCENES";
+        State[State["INTRO"] = 7] = "INTRO";
+        State[State["HOWTOPLAY"] = 8] = "HOWTOPLAY";
+        State[State["NUM_OF_SCENES"] = 9] = "NUM_OF_SCENES";
     })(State = scenes.State || (scenes.State = {}));
 })(scenes || (scenes = {}));
 //# sourceMappingURL=State.js.map

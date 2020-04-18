@@ -44,7 +44,7 @@ var managers;
                     switch (object2.type) {
                         case enums.GameObjectType.ISLAND:
                             console.log("Collision with Big Enemy lost 10 point!");
-                            var yaySound = createjs.Sound.play("yay");
+                            var yaySound = createjs.Sound.play("thunder");
                             yaySound.volume = 0.2;
                             break;
                         case enums.GameObjectType.ENEMY:

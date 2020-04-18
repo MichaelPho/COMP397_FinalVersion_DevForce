@@ -27,7 +27,7 @@ var scenes;
         // PUBLIC METHODS
         Start.prototype.Start = function () {
             //instantiate a new Text object
-            this._welcomeLabel = new objects.Label("The Game", "80px", "Consolas", "#FFFF00", 370, 180, true);
+            this._welcomeLabel = new objects.Label("Metal Force", "80px", "Consolas", "#FFFF00", 370, 180, true);
             // buttons
             this._startButton = new objects.Button(config.Game.ASSETS.getResult("startButton"), 370, 430, true);
             this._startButton2 = new objects.Button(config.Game.ASSETS.getResult("instruction"), 370, 530, true);
@@ -48,10 +48,10 @@ var scenes;
                 config.Game.SCENE = scenes.State.LEVEL;
             });
             this._startButton2.on("click", function () {
-                // config.Game.SCENE = scenes.State.PLAY2;
+                config.Game.SCENE = scenes.State.HOWTOPLAY;
             });
             this._startButton3.on("click", function () {
-                // config.Game.SCENE = scenes.State.PLAY3;
+                config.Game.SCENE = scenes.State.INTRO;
             });
         };
         return Start;

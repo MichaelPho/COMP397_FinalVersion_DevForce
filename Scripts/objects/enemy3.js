@@ -78,7 +78,7 @@ var objects;
             this._checkBounds();
         };
         enemy3.prototype.Reset = function () {
-            this.Health = 3;
+            this.Health = 5;
             var randomX = util.Mathf.RandomRange(this.halfWidth, config.Game.SCREEN_WIDTH - this.halfWidth);
             //  let randomY = util.Mathf.RandomRange(-this.height * 3, -this.height);
             this.position = new objects.Vector2(randomX, 0);

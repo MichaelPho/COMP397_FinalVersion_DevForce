@@ -8,20 +8,21 @@ var Game = (function () {
     var currentSceneState;
     var currentScene;
     var assets;
+    var engineSound = createjs.Sound.play("engine");
     var assetManifest = [
         { id: "button", src: "./Assets/images/button.png" },
         { id: "bullet", src: "./Assets/images/bullet.png" },
         { id: "placeholder", src: "./Assets/images/placeholder.png" },
         { id: "startButton", src: "./Assets/images/start.png" },
-        { id: "nextButton", src: "./Assets/images/reset.png" },
+        { id: "nextButton", src: "./Assets/images/next.png" },
         { id: "backButton", src: "./Assets/images/reset.png" },
         { id: "ocean", src: "./Assets/images/ocean.gif" },
         { id: "plane", src: "./Assets/images/plane.png" },
         { id: "island", src: "./Assets/images/island.png" },
         { id: "cloud", src: "./Assets/images/cloud.png" },
-        { id: "engine", src: "./Assets/audio/engine.ogg" },
+        { id: "engine", src: "./Assets/audio/theme.mp3" },
         { id: "yay", src: "./Assets/audio/yay.ogg" },
-        { id: "thunder", src: "./Assets/audio/thunder.ogg" },
+        { id: "thunder", src: "./Assets/audio/bomb.mp3" },
         { id: "platform", src: "./Assets/images/round1.png" },
         { id: "background", src: "./Assets/images/background.jpg" },
         { id: "background2", src: "./Assets/images/background2.jpg" },
@@ -36,7 +37,13 @@ var Game = (function () {
         { id: "bosslevel", src: "./Assets/images/boss.png" },
         { id: "instruction", src: "./Assets/images/instruction.png" },
         { id: "levelbackground", src: "./Assets/images/levelscreen.jpg" },
-        { id: "credit", src: "./Assets/images/credit.png" }
+        { id: "shooting", src: "./Assets/audio/shoot.mp3" },
+        { id: "credit", src: "./Assets/images/credit.png" },
+        { id: "intro", src: "./Assets/images/intro.png" },
+        { id: "turnBack", src: "./Assets/images/back.png" },
+        { id: "step1", src: "./Assets/images/step1.png" },
+        { id: "step2", src: "./Assets/images/step2.png" },
+        { id: "step3", src: "./Assets/images/step3.png" }
     ];
     function Preload() {
         assets = new createjs.LoadQueue(); // asset container
@@ -50,6 +57,9 @@ var Game = (function () {
      * It sets the framerate to 60 FPS and sets up the main Game Loop (Update)
      */
     function Start() {
+        var engineSound = createjs.Sound.play("engine");
+        engineSound.loop = -1; // loop forever
+        engineSound.volume = 0.1; // 10% volume
         console.log("%c Game Started!", "color: blue; font-size: 20px; font-weight: bold;");
         stage = new createjs.Stage(canvas);
         createjs.Ticker.framerate = config.Game.FPS;
@@ -105,6 +115,16 @@ var Game = (function () {
             case scenes.State.PLAY3:
                 console.log("switch to Play Scene level 3");
                 currentScene = new scenes.Play3();
+                break;
+            case scenes.State.INTRO:
+                engineSound.stop();
+                console.log("");
+                currentScene = new scenes.Intro();
+                break;
+            case scenes.State.HOWTOPLAY:
+                engineSound.stop();
+                console.log("");
+                currentScene = new scenes.HowToPlay();
                 break;
             case scenes.State.BOSS:
                 console.log("switch to Play Scene Boss level");

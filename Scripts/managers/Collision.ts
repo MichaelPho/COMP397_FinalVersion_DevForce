@@ -55,7 +55,7 @@ module managers
                         {
                             case enums.GameObjectType.ISLAND:
                                 console.log("Collision with Big Enemy lost 10 point!");
-                                let yaySound = createjs.Sound.play("yay");
+                                let yaySound = createjs.Sound.play("thunder");
                                 yaySound.volume = 0.2;
 
                                

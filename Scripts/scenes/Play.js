@@ -30,15 +30,16 @@ var scenes;
         Play.prototype.Start = function () {
             this.platform = new objects.platform();
             this.bullet = new objects.bullet();
-            this.status = new objects.Label("0/" + config.Game.FINISH_NUM, "40px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH / 2, 30, true);
-            //  this._plane = new objects.Plane();
+            this.status = new objects.Label("kill: 0/" + config.Game.FINISH_NUM, "30px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH - 100, 20, true);
+            this.health = new objects.Label(" ", "30px", "Consolas", "#FFFF00", 30, 20, true);
+            this.score = new objects.Label("score: ", "30px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH / 2, config.Game.SCREEN_HEIGHT - 30, true);
             this.enemy2 = new objects.enemy2();
             this.master = new objects.Catsle();
             // create the cloud array
             this.enemy = new Array(); // empty container
             var i = 1;
             var temp;
-            // instantiating CLOUD_NUM clouds
+            // instantiating ENEMY_NUM 
             for (var index = 0; index < config.Game.ENEMY_NUM; index++) {
                 temp = new objects.enemy();
                 this.enemy.push(temp);
@@ -46,22 +47,12 @@ var scenes;
             this.Main();
         };
         Play.prototype.Update = function () {
-            // setTimeout(() => {
-            //     console.log("tesr 3 second");  
-            //   },1000 );
-            //     setTimeout(() => { alert('Hello') }, 2000);
-            //    this.platform.Update();
-            //    let smallestDistance:number=0;
             var _this = this;
-            //   this._plane.Update();
-            //this.Kill(this.check);
-            //changing
             this.check = false;
             this.master.Update();
             this.bullet.Update();
             this.enemy.forEach(function (en) {
                 en.Update();
-                // managers.Collision.squaredRadiusCheck(this.master, en);
             });
             var locationX = this.bullet.x;
             if (this.bullet.x != 0 && this.bullet.y != 1000) {
@@ -69,8 +60,6 @@ var scenes;
             }
             this.checkDamage();
             //locaction check
-            //    console.log("x: "+locationX);
-            //    console.log("x master: "+this.master.x);
             var onClick = function (e) {
                 if (_this.bullet.position.y == 1000 && _this.bullet.position.x == 0) {
                     sessionStorage.X = e.clientX;
@@ -78,6 +67,7 @@ var scenes;
                     sessionStorage.check = true;
                 }
             };
+            //shooting start
             this.check = sessionStorage.check;
             if (this.check) {
                 this.addChild(this.bullet);
@@ -87,11 +77,17 @@ var scenes;
                 var l = Math.sqrt(x * x + y * y);
                 this.bullet.angle.x = x / l * -10;
                 this.bullet.angle.y = y / l * -10;
+                var Sound = createjs.Sound.play("shooting");
+                Sound.volume = 0.2;
                 this.bullet.StartRun();
                 sessionStorage.clear();
             }
             //console.log("changed x: "+this.bullet.x +" y: "+this.bullet.y);
-            this.status.text = this.master.score + "/" + config.Game.FINISH_NUM;
+            this.status.text = "kill: " + this.master.score + "/" + config.Game.FINISH_NUM;
+            this.health.text = "Health: " + (config.Game.DEATH_NUM - this.master.damage);
+            this.score.text = "score:" + (config.Game.SCORE);
+            if (config.Game.HIGH_SCORE < config.Game.SCORE)
+                config.Game.HIGH_SCORE = config.Game.SCORE;
             window.addEventListener('click', onClick);
         };
         Play.prototype.checkgun = function () {
@@ -101,6 +97,7 @@ var scenes;
                 if (managers.Collision.AABBCheck(_this.bullet, en)) {
                     en.Reset();
                     _this.master.score += 1;
+                    config.Game.SCORE += 1 * 100;
                     console.log("shoot small: " + _this.master.score);
                     console.log("changed x: " + _this.bullet.x + " y: " + _this.bullet.y);
                     _this.bullet.Reset();
@@ -121,7 +118,6 @@ var scenes;
             var _this = this;
             this.addChild(this.platform);
             this.addChild(this.enemy2);
-            //  this.addChild(this._plane);
             var i = 1;
             var _loop_1 = function (en) {
                 setTimeout(function () {
@@ -136,31 +132,15 @@ var scenes;
                 _loop_1(en);
             }
             this.addChild(this.master);
+            this.addChild(this.health);
+            this.addChild(this.score);
             this.addChild(this.status);
-        };
-        Play.prototype.Kill = function (a) {
-            if (a) {
-                this.enemy.forEach(function (element) {
-                    if (element.y > 400) {
-                        element.Reset();
-                        console.log("kill small");
-                        return false;
-                    }
-                });
-                if (this.enemy2.y > 400) {
-                    this.enemy2.Reset();
-                    console.log("kill big");
-                    return false;
-                }
-            }
-            else {
-                return true;
-            }
         };
         Play.prototype.checkDamage = function () {
             var _this = this;
             this.enemy.forEach(function (en) {
-                if (en.y == 650) {
+                if (en.y == 680) {
+                    en.Reset();
                     _this.master.damage += 1;
                     console.log("damage :" + _this.master.damage);
                 }

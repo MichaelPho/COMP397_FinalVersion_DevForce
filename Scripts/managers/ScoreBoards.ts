@@ -20,7 +20,7 @@ module managers
         public set Lives(v : number) 
         {
             this._lives = v;
-            config.Game.LIVES = this._lives;
+           
             this.LivesLabel.text = "Lives: " + this._lives;
         }
         
@@ -75,7 +75,7 @@ module managers
             this._livesLabel = new objects.Label("Lives: 99", "20px", "Consolas", "#FFFF00", 0, 0);
             this._scoreLabel = new objects.Label("Score: 99999", "20px", "Consolas", "#FFFF00", 0, 0);
             this._highScoreLabel = new objects.Label("High Score: 99999", "40px", "Consolas", "#FFFF00", 0, 0);
-            this.Lives = config.Game.LIVES;
+           
             this.Score = config.Game.SCORE;
             this.HighScore = config.Game.HIGH_SCORE;
         }

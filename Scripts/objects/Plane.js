@@ -42,9 +42,6 @@ var objects;
         Plane.prototype.Start = function () {
             this.type = enums.GameObjectType.PLANE;
             this._verticalPosition = 890; // locked to the bottom of the screen
-            var engineSound = createjs.Sound.play("engine");
-            engineSound.loop = -1; // loop forever
-            engineSound.volume = 0.1; // 10% volume
         };
         Plane.prototype.Update = function () {
             this._move();

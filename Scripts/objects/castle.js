@@ -87,9 +87,6 @@ var objects;
             this.type = enums.GameObjectType.PLANE;
             this._verticalPosition = 880; // locked to the bottom of the screen
             this._horizonalPosition = 370;
-            var engineSound = createjs.Sound.play("engine");
-            engineSound.loop = -1; // loop forever
-            engineSound.volume = 0.1; // 10% volume
             this.position = new objects.Vector2(this._horizonalPosition, this._verticalPosition);
             this.isCentered = true;
         };

@@ -11,11 +11,13 @@ module config
         public static ENEMY_NUM: number = 5;
         public static ENEMY_NUM2: number = 15;
         public static FINISH_NUM: number = 10;
-        public static FINISH_NUM2: number = 100;
-        public static DEATH_NUM: number = 500;
+        public static FINISH_NUM2: number = 30;
+        public static FINISH_NUM3: number = 50;
+        public static DEATH_NUM2: number = 100;
+        public static DEATH_NUM: number = 200;
         public static SCORE: number = 0;
         public static HIGH_SCORE: number = 0;
         public static SCORE_BOARD: managers.ScoreBoard;
-        public static LIVES: number = 15;
+        public static CURRENT_LIVES: number = 0;
     }
 }

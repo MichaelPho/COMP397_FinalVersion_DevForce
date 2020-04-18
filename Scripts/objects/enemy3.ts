@@ -83,7 +83,8 @@ module objects
         
         public Reset(): void 
         {
-            this.Health=3;
+            
+            this.Health=5;
             let randomX = util.Mathf.RandomRange(this.halfWidth, config.Game.SCREEN_WIDTH - this.halfWidth);
           //  let randomY = util.Mathf.RandomRange(-this.height * 3, -this.height);
             this.position = new Vector2(randomX,0);

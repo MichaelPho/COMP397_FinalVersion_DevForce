@@ -30,15 +30,17 @@ var scenes;
         Play3.prototype.Start = function () {
             this.platform = new objects.platform(config.Game.ASSETS.getResult("background3"));
             this.bullet = new objects.bullet();
-            this.status = new objects.Label("0/" + config.Game.FINISH_NUM2, "40px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH / 2, 30, true);
-            //  this._plane = new objects.Plane();
+            this.status = new objects.Label("kill: 0/" + config.Game.FINISH_NUM3, "30px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH - 100, 20, true);
+            this.health = new objects.Label(" ", "30px", "Consolas", "#FFFF00", 30, 20, true);
+            this.score = new objects.Label("score: ", "30px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH / 2, config.Game.SCREEN_HEIGHT - 30, true);
+            //player
             this.master = new objects.Catsle();
-            // create the cloud array
+            // create the enemy array
             this.enemy = new Array(); // empty container
             this.enemy2 = new Array(); // empty container
             var i = 1;
             var temp;
-            // instantiating CLOUD_NUM clouds
+            // instantiating enemy_NUM enemys
             for (var index = 0; index < config.Game.ENEMY_NUM2; index++) {
                 temp = new objects.enemy3();
                 this.enemy.push(temp);
@@ -95,35 +97,19 @@ var scenes;
                 this.checkgun();
             }
             this.checkDamage();
+            this.movingCheck(this.testing);
+            var stopMoving = function (e) {
+                _this.testing = 0;
+            };
             var moving = function (e) {
                 // PRESS LEFT ARROW
                 if (e.keyCode == 37) {
-                    if (_this.bullet.position.y == _this.master.position.y) {
-                        _this.bullet.position.x -= 0.03;
-                    }
-                    _this.master.x -= 0.03;
-                    console.log("go left ");
+                    _this.testing = 1;
                 }
-                // // PRESS UP ARROW
-                // else if (e.keyCode == 38) {
-                //     window.alert("Up Key Pressed");
-                // }
                 // PRESS RIGHT ARROW
                 else if (e.keyCode == 39) {
-                    if (_this.bullet.position.y == _this.master.position.y) {
-                        _this.bullet.position.x += 0.03;
-                    }
-                    _this.master.x += 0.03;
-                    console.log("go right ");
+                    _this.testing = 2;
                 }
-                // // PRESS DOWN ARROW
-                // else if (e.keyCode == 40) {
-                //     window.alert("Down Key Pressed");
-                // }
-                // PRESS SPACE BAR
-                //  else if (e.keyCode == 32) {
-                //      window.alert("Space Key Pressed");
-                //  }
             };
             // this.bullet.start=true;
             var onClick = function (e) {
@@ -134,15 +120,38 @@ var scenes;
                     // objects.Vector2.angle(new objects.Vector2(this.master.x,this.master.y),new objects.Vector2(this.master.x,this.master.y))
                     _this.bullet.angle.x = x / l * -10;
                     _this.bullet.angle.y = y / l * -10;
+                    var Sound = createjs.Sound.play("shooting");
+                    Sound.volume = 0.2;
                     _this.bullet.StartRun(new objects.Vector2(_this.master.x, _this.master.y));
                 }
             };
-            this.status.text = this.master.score + "/" + config.Game.FINISH_NUM2;
+            //Score Board Label
+            this.status.text = "kill: " + this.master.score + "/" + config.Game.FINISH_NUM3;
+            this.health.text = "Health: " + (config.Game.CURRENT_LIVES);
+            this.score.text = "score:" + (config.Game.SCORE);
+            if (config.Game.HIGH_SCORE < config.Game.SCORE)
+                config.Game.HIGH_SCORE = config.Game.SCORE;
             if (this.bullet.start) {
                 console.log("turn to true");
             }
+            //event for moving and shooting
             window.addEventListener('click', onClick);
             window.addEventListener('keydown', moving);
+            window.addEventListener('keyup', stopMoving);
+        };
+        Play3.prototype.movingCheck = function (check) {
+            if (check == 1) {
+                if (this.bullet.position.y == this.master.position.y) {
+                    this.bullet.position.x -= 3;
+                }
+                this.master.x -= 3;
+            }
+            else if (check == 2) {
+                if (this.bullet.position.y == this.master.position.y) {
+                    this.bullet.position.x += 3;
+                }
+                this.master.x += 3;
+            }
         };
         Play3.prototype.checkgun = function () {
             var _this = this;
@@ -153,8 +162,32 @@ var scenes;
                 if (managers.Collision.AABBCheck(en, _this.bullet)) {
                     if (en.Health == 0) {
                         en.Reset();
+                        config.Game.SCORE += 1 * 150;
                         _this.master.score += 1;
-                        console.log("shoot small: " + _this.master.score);
+                        console.log("shoot shooter: " + _this.master.score);
+                        _this.removeChild(en.enemyBullet);
+                        en.enemyBullet.Reset();
+                        _this.bullet.Reset();
+                    }
+                    else {
+                        _this.removeChild(en.enemyBullet);
+                        _this.bullet.Reset();
+                        console.log(en.Health + " is health");
+                        en.Health -= 1;
+                    }
+                }
+            });
+            this.enemy2.forEach(function (en) {
+                if (managers.Collision.AABBCheck(en.enemyBullet, _this.bullet)) {
+                    _this.removeChild(en.enemyBullet);
+                }
+                if (managers.Collision.AABBCheck(en, _this.bullet)) {
+                    if (en.Health == 0) {
+                        en.Reset();
+                        _this.master.score += 5;
+                        config.Game.SCORE += 1 * 250;
+                        console.log("shoot big: " + _this.master.score);
+                        _this.removeChild(en.enemyBullet);
                         _this.bullet.Reset();
                     }
                     else {
@@ -164,21 +197,16 @@ var scenes;
                     }
                 }
             });
-            this.enemy2.forEach(function (en) {
-                if (managers.Collision.AABBCheck(_this.bullet, en)) {
-                    en.Reset();
-                    _this.master.score += 2;
-                    console.log("shoot big" + _this.master.score);
-                    _this.bullet.Reset();
-                }
-            });
-            if (this.master.score >= config.Game.FINISH_NUM2) {
+            if (this.master.score >= config.Game.FINISH_NUM3) {
                 config.Game.SCENE = scenes.State.END;
             }
         };
         Play3.prototype.Main = function () {
             var _this = this;
             this.addChild(this.platform);
+            if (config.Game.CURRENT_LIVES == 0) {
+                config.Game.CURRENT_LIVES = 100;
+            }
             //  this.addChild(this._plane);
             var i = 1;
             var _loop_1 = function (en) {
@@ -203,6 +231,8 @@ var scenes;
                 this_1.addChild(this_1.master);
                 this_1.addChild(this_1.bullet);
                 this_1.addChild(this_1.status);
+                this_1.addChild(this_1.score);
+                this_1.addChild(this_1.health);
             };
             var this_1 = this;
             for (var _i = 0, _a = this.enemy; _i < _a.length; _i++) {
@@ -210,49 +240,31 @@ var scenes;
                 _loop_1(en);
             }
         };
-        Play3.prototype.Kill = function (a) {
-            if (a) {
-                this.enemy.forEach(function (element) {
-                    if (element.y > 400) {
-                        element.Reset();
-                        console.log("kill small");
-                        return false;
-                    }
-                });
-                this.enemy2.forEach(function (element) {
-                    if (element.y > 400) {
-                        element.Reset();
-                        console.log("kill big");
-                        return false;
-                    }
-                });
-            }
-            else {
-                return true;
-            }
-        };
         Play3.prototype.checkDamage = function () {
             var _this = this;
             this.enemy.forEach(function (en) {
                 if (managers.Collision.AABBCheck(_this.master, en)) {
                     _this.master.damage += 5;
+                    config.Game.CURRENT_LIVES -= 5;
                     console.log("damage :" + _this.master.damage);
                     en.Reset();
                 }
                 if (managers.Collision.AABBCheck(_this.master, en.enemyBullet)) {
                     _this.removeChild(en.enemyBullet);
                     _this.master.damage += 2;
+                    config.Game.CURRENT_LIVES -= 2;
                     console.log("damage from enemy bullet :" + _this.master.damage);
                 }
             });
             this.enemy2.forEach(function (en) {
-                if (managers.Collision.squaredRadiusCheck(_this.master, en)) {
+                if (managers.Collision.AABBCheck(_this.master, en)) {
                     _this.master.damage += 10;
+                    config.Game.CURRENT_LIVES -= 10;
                     console.log("damage :" + _this.master.damage);
                     en.Reset();
                 }
             });
-            if (this.master.damage >= config.Game.DEATH_NUM) {
+            if (config.Game.CURRENT_LIVES <= 0) {
                 config.Game.SCENE = scenes.State.END;
             }
         };

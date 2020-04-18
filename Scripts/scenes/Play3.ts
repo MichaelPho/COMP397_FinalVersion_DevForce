@@ -8,7 +8,10 @@ module scenes {
         private bullet?: objects.bullet;
         private check?: boolean = true;
         private status: objects.Label;
+        private health: objects.Label;
+        private score: objects.Label;
         private enemy: Array<objects.enemy3>;
+        private testing: number;
 
         // PUBLIC PROPERTIES
 
@@ -29,20 +32,22 @@ module scenes {
             this.platform = new objects.platform(config.Game.ASSETS.getResult("background3"));
 
             this.bullet = new objects.bullet();
-            
-            
-            this.status = new objects.Label("0/" + config.Game.FINISH_NUM2, "40px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH / 2, 30, true);
 
-            //  this._plane = new objects.Plane();
 
+            this.status = new objects.Label("kill: 0/" + config.Game.FINISH_NUM3, "30px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH -100, 20, true);
+            this.health = new objects.Label(" ", "30px", "Consolas", "#FFFF00", 30, 20, true);
+            this.score = new objects.Label("score: ", "30px", "Consolas", "#FFFF00", config.Game.SCREEN_WIDTH/2, config.Game.SCREEN_HEIGHT-30, true);
+          
+          
+            //player
             this.master = new objects.Catsle();
 
-            // create the cloud array
+            // create the enemy array
             this.enemy = new Array<objects.enemy3>(); // empty container
             this.enemy2 = new Array<objects.enemy2>(); // empty container
             let i: number = 1;
             let temp: objects.enemy3;
-            // instantiating CLOUD_NUM clouds
+            // instantiating enemy_NUM enemys
             for (let index = 0; index < config.Game.ENEMY_NUM2; index++) {
                 temp = new objects.enemy3();
 
@@ -75,7 +80,7 @@ module scenes {
 
             //   this._plane.Update();
 
-            
+
 
 
             //this.Kill(this.check);
@@ -85,30 +90,28 @@ module scenes {
             this.bullet.Update();
             this.enemy.forEach((en) => {
                 en.Update();
-                if(en.CheckBounds())
-                {
-                    
+                if (en.CheckBounds()) {
+
                     en.enemyBullet.Update();
                     //console.log("bullet with"+ en.enemyBullet.x+ " y" + en.enemyBullet.y)   ;
-                   // console.log("enemy with"+ en.x+ " y" + en.y)   ;
-                    if (en.enemyBullet.y==0) {
-                       console.log("success");
-                        let x = en.x - this.master.x ;
-                        let y = en.y - this.master.y ;
+                    // console.log("enemy with"+ en.x+ " y" + en.y)   ;
+                    if (en.enemyBullet.y == 0) {
+                        console.log("success");
+                        let x = en.x - this.master.x;
+                        let y = en.y - this.master.y;
                         let l = Math.sqrt(x * x + y * y);
-    
+
                         // objects.Vector2.angle(new objects.Vector2(this.master.x,this.master.y),new objects.Vector2(this.master.x,this.master.y))
                         en.enemyBullet.angle.x = x / l * -2;
                         en.enemyBullet.angle.y = y / l * -2;
                         this.addChild(en.enemyBullet);
                         en.enemyBullet.StartRun(new objects.Vector2(en.x, en.y));
 
-                        
-                       
-                       
+
+
+
                     }
-                    else if(en.enemyBullet.CheckBounds())
-                    {
+                    else if (en.enemyBullet.CheckBounds()) {
                         console.log("enemy bullet gone");
                         this.removeChild(en.enemyBullet);
                     }
@@ -133,36 +136,26 @@ module scenes {
 
             this.checkDamage();
 
+
+            this.movingCheck(this.testing);
+
+            const stopMoving = (e: KeyboardEvent) => {
+
+                this.testing = 0
+            }
+            
+            
             const moving = (e: KeyboardEvent) => {
                 // PRESS LEFT ARROW
                 if (e.keyCode == 37) {
-                    if (this.bullet.position.y == this.master.position.y) { this.bullet.position.x -= 0.03; }
-                    this.master.x -= 0.03;
-                    console.log("go left ");
+                    this.testing = 1;
+
                 }
-                // // PRESS UP ARROW
-                // else if (e.keyCode == 38) {
-                //     window.alert("Up Key Pressed");
-                // }
                 // PRESS RIGHT ARROW
                 else if (e.keyCode == 39) {
-                    if (this.bullet.position.y == this.master.position.y) { this.bullet.position.x += 0.03; }
-                    this.master.x += 0.03;
-                    console.log("go right ");
+                    this.testing = 2;
                 }
-                // // PRESS DOWN ARROW
-                // else if (e.keyCode == 40) {
-                //     window.alert("Down Key Pressed");
-                // }
-                // PRESS SPACE BAR
-                //  else if (e.keyCode == 32) {
-                //      window.alert("Space Key Pressed");
-                //  }
-
-
-
-
-
+            
             };
 
             // this.bullet.start=true;
@@ -177,7 +170,8 @@ module scenes {
                     this.bullet.angle.x = x / l * -10;
                     this.bullet.angle.y = y / l * -10
                         ;
-
+                        let Sound = createjs.Sound.play("shooting");
+                        Sound.volume = 0.2;
                     this.bullet.StartRun(new objects.Vector2(this.master.x, this.master.y));
 
 
@@ -186,50 +180,94 @@ module scenes {
 
             };
 
-            this.status.text = this.master.score + "/" + config.Game.FINISH_NUM2;
+            //Score Board Label
+            
+            this.status.text = "kill: "+ this.master.score + "/" + config.Game.FINISH_NUM3;
+            this.health.text = "Health: "+ (config.Game.CURRENT_LIVES) ;
+            this.score.text = "score:"+ (config.Game.SCORE)  ;
+            if(config.Game.HIGH_SCORE<config.Game.SCORE)
+            config.Game.HIGH_SCORE= config.Game.SCORE
+
+
+
 
             if (this.bullet.start) {
                 console.log("turn to true");
             }
 
+            //event for moving and shooting
             window.addEventListener('click', onClick);
             window.addEventListener('keydown', moving);
-
+            window.addEventListener('keyup', stopMoving);
 
 
         }
+
+
+        movingCheck(check: number) {
+            if (check == 1) {
+                if (this.bullet.position.y == this.master.position.y) { this.bullet.position.x -= 3; }
+                this.master.x -= 3;
+            }
+            else if (check == 2) {
+                if (this.bullet.position.y == this.master.position.y) { this.bullet.position.x += 3; }
+                this.master.x += 3;
+            }
+
+        }
+
         checkgun() {
             this.enemy.forEach((en) => {
-                if(managers.Collision.AABBCheck(en.enemyBullet,this.bullet)){
+                if (managers.Collision.AABBCheck(en.enemyBullet, this.bullet)) {
                     this.removeChild(en.enemyBullet);
                 }
-                if (managers.Collision.AABBCheck( en,this.bullet)) {
-                    if(en.Health==0){
-                    en.Reset();
-                    this.master.score += 1;
-                    console.log("shoot small: " + this.master.score);
-                    this.bullet.Reset();}
-                    else{
+                if (managers.Collision.AABBCheck(en, this.bullet)) {
+                    if (en.Health == 0) {
+                        en.Reset();
+                        config.Game.SCORE+=1*150;
+                        this.master.score += 1;
+                        console.log("shoot shooter: " + this.master.score);
+                        
+                        this.removeChild(en.enemyBullet)
+                        en.enemyBullet.Reset();
                         this.bullet.Reset();
-                        console.log(en.Health+" is health")
-                        en.Health-=1;
+                    }
+                    else {
+                        this.removeChild(en.enemyBullet);
+                        this.bullet.Reset();
+                        console.log(en.Health + " is health")
+                        en.Health -= 1;
                     }
                 }
             });
             this.enemy2.forEach((en) => {
-                if (managers.Collision.AABBCheck(this.bullet, en)) {
-                    en.Reset();
-                    this.master.score += 2;
-                    console.log("shoot big" + this.master.score);
-                    this.bullet.Reset();
+               
+                if (managers.Collision.AABBCheck(en.enemyBullet, this.bullet)) {
+                    this.removeChild(en.enemyBullet);
+                }
+                if (managers.Collision.AABBCheck(en, this.bullet)) {
+                    if (en.Health == 0) {
+                        en.Reset();
+                        this.master.score += 5;
+                        config.Game.SCORE+=1*250;
+                        console.log("shoot big: " + this.master.score);
+                        this.removeChild(en.enemyBullet)
+                        this.bullet.Reset();
+                    }
+                    else {
+                        this.bullet.Reset();
+                        console.log(en.Health + " is health")
+                        en.Health -= 1;
+                    }
                 }
             });
+            
 
 
 
-
-            if (this.master.score >= config.Game.FINISH_NUM2) {
+            if (this.master.score >= config.Game.FINISH_NUM3) {
                 config.Game.SCENE = scenes.State.END;
+              
             }
 
         }
@@ -240,7 +278,10 @@ module scenes {
             this.addChild(this.platform);
 
 
-
+            if (config.Game.CURRENT_LIVES==0)
+            {
+                config.Game.CURRENT_LIVES=100;
+            }
             //  this.addChild(this._plane);
             let i: number = 1;
             for (const en of this.enemy) {
@@ -259,68 +300,43 @@ module scenes {
                         console.log("enemy out");
                     }, i * 8000);
                     i++;
-                   
+
                 }
                 this.addChild(this.master);
                 this.addChild(this.bullet);
                 this.addChild(this.status);
+                this.addChild(this.score);
+                this.addChild(this.health);
             }
         }
-        private Kill(a: boolean): boolean {
+              private checkDamage(): void {
 
-
-            if (a) {
-                this.enemy.forEach(element => {
-                    if (element.y > 400) {
-                        element.Reset();
-                        console.log("kill small");
-
-                        return false;
-                    }
-                });
-                this.enemy2.forEach(element => {
-                    if (element.y > 400) {
-                        element.Reset();
-                        console.log("kill big");
-
-                        return false;
-                    }
-                });
-            }
-            else {
-
-                return true;
-            }
-
-
-
-
-        }
-        private checkDamage(): void {
-           
             this.enemy.forEach((en) => {
-             
+
                 if (managers.Collision.AABBCheck(this.master, en)) {
                     this.master.damage += 5;
+                    config.Game.CURRENT_LIVES-=5;
                     console.log("damage :" + this.master.damage);
                     en.Reset();
                 }
-                if(managers.Collision.AABBCheck(this.master,en.enemyBullet)){
+                if (managers.Collision.AABBCheck(this.master, en.enemyBullet)) {
                     this.removeChild(en.enemyBullet);
                     this.master.damage += 2;
+                    config.Game.CURRENT_LIVES-=2;
                     console.log("damage from enemy bullet :" + this.master.damage);
                 }
             });
             this.enemy2.forEach((en) => {
-                if (managers.Collision.squaredRadiusCheck(this.master, en)) {
+                if (managers.Collision.AABBCheck(this.master, en)) {
                     this.master.damage += 10;
+                    config.Game.CURRENT_LIVES-=10;
                     console.log("damage :" + this.master.damage);
                     en.Reset();
                 }
             });
 
 
-            if (this.master.damage >= config.Game.DEATH_NUM) {
+            if (config.Game.CURRENT_LIVES <=0) {
                 config.Game.SCENE = scenes.State.END;
             }
         }

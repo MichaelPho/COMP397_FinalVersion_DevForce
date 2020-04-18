@@ -43,10 +43,7 @@ module objects
         {
             this.type = enums.GameObjectType.PLANE;
             this._verticalPosition = 890; // locked to the bottom of the screen
-            let engineSound = createjs.Sound.play("engine");
-            engineSound.loop = -1; // loop forever
-            engineSound.volume = 0.1; // 10% volume
-        }
+            }
 
         public Update(): void 
         {

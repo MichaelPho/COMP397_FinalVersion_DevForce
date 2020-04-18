@@ -4,11 +4,11 @@ module objects
     {
         // PRIVATE INSTANCE MEMBERS
         private _verticalSpeed?:number;
-
+        
         // PUBLIC PROPERTIES
 
         // CONSTRUCTOR
-        constructor(img: Object =config.Game.ASSETS.getResult("background"))
+        constructor(img: Object =config.Game.ASSETS.getResult("background") )
         {
             super(img);
 
@@ -44,7 +44,14 @@ module objects
             this._move();
             this._checkBounds();
         }
-        
+         public SetMiddle(): void 
+        {
+            this.position= new Vector2(120,200)
+        }
+        public SetMiddle2(): void 
+        {
+            this.position= new Vector2(60,60)
+        }
         public Reset(): void 
         {
             this.position = new Vector2(0, 0);
